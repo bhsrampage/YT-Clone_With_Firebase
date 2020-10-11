@@ -2,12 +2,14 @@ import React, {createContext, useState} from 'react';
 import auth from '@react-native-firebase/auth';
 import {ToastAndroid, Alert} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import { ActivityIndicator } from 'react-native-paper';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [users, setUsers] = useState(null);
   const curentUser = auth().currentUser;
+  //const [isLoading , setIsLoading] = useState(true);
   return (
     <AuthContext.Provider
       value={{
@@ -44,6 +46,7 @@ export const AuthProvider = ({children}) => {
             await auth()
               .createUserWithEmailAndPassword(email, password)
               .then(() => {
+                //setIsLoading(false);
                 ToastAndroid.show(
                   'User Profile Created Succesfully:)',
                   ToastAndroid.SHORT,
@@ -68,6 +71,21 @@ export const AuthProvider = ({children}) => {
             console.log(Exception);
           }
         },
+
+        delete1 : async() => {
+          try{
+             await curentUser.delete().then(
+               () =>{
+                ToastAndroid.show(
+                  'User Deleted Successfully',
+                  ToastAndroid.SHORT,
+                );
+               }
+             )
+          }catch(Exception){
+            console.log(Exception);
+          }
+        }
       }}>
       {children}
     </AuthContext.Provider>

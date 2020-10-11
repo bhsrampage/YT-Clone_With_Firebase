@@ -6,6 +6,7 @@ import {
   StatusBar,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Button, Card} from 'react-native-paper';
@@ -14,6 +15,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {AuthContext} from './Authentication/AuthProvider';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 
 const ProfileScreen = () => {
   const currentUser = auth().currentUser;
@@ -23,6 +25,7 @@ const ProfileScreen = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [used, setUsed] = useState(false);
+  const navigation = useNavigation();
 
   const [data, setData] = useState({
     email: '',
@@ -31,8 +34,10 @@ const ProfileScreen = () => {
     dateOfBirth: '',
     gender: 'Male',
     imgsrc: '',
+    id:'',
   });
   const {logout} = useContext(AuthContext);
+  const {delete1} = useContext(AuthContext);
 
   useEffect(() => {
     userRef.get().then((querySnapshot) => {
@@ -40,6 +45,7 @@ const ProfileScreen = () => {
       querySnapshot.forEach((doc) => {
         const {Name, Password, DOB, Gender, ImgSource, Email} = doc.data();
         list.push({
+          id: doc.id,
           Name,
           Password,
           DOB,
@@ -58,7 +64,7 @@ const ProfileScreen = () => {
   {
     used
       ? null
-      : users.map((user, index) => {
+      : users.map(async (user, index) => {
           console.log(user.Name);
           setUsed(true);
           setData({
@@ -69,7 +75,9 @@ const ProfileScreen = () => {
             dateOfBirth: user.DOB,
             gender: user.Gender,
             imgsrc: user.ImgSource,
+            id: user.id,
           });
+          await AsyncStorage.setItem('Doc_Id', user.id);
         });
   }
   /* const loadUser = async () => {
@@ -88,6 +96,17 @@ const ProfileScreen = () => {
     }
   };*/
 
+  const DeleteUser = () => {
+    delete1();
+    firestore()
+    .collection('Users')
+    .doc(data.id)
+    .delete().then(()=>{
+      console.log("Deleted");
+    })
+    
+  }
+
   return (
     <ScrollView indicatorStyle="white">
       <View style={styles.container}>
@@ -101,6 +120,8 @@ const ProfileScreen = () => {
                 width: 150,
                 borderRadius: 150 / 2,
                 marginTop: 25,
+                borderColor:"#009387",
+                borderWidth:3
               }}
             />
           </View>
@@ -155,6 +176,30 @@ const ProfileScreen = () => {
             ]}
             onPress={() => logout()}>
             <Text style={styles.textSign}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{marginTop:20}}>
+          <TouchableOpacity
+            style={[
+              styles.signOut,
+              {
+                borderColor: 'black',
+                backgroundColor:'red',
+                borderWidth: 2,
+                marginTop: 15,
+                justifyContent: 'space-evenly',
+              },
+            ]}
+            onPress={() =>{
+              Alert.alert("Are You sure!!","On pressing okay yor user account will be deleted",[
+                {text: 'Okay' , 
+                 onPress:() => {
+                 DeleteUser();
+                }},
+                {text:'Cancel' }
+              ]);
+            }}>
+            <Text style={styles.textSign}>Delete Account</Text>
           </TouchableOpacity>
         </View>
       </View>

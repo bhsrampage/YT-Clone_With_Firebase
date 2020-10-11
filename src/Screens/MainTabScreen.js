@@ -19,7 +19,7 @@ const Tab = createMaterialBottomTabNavigator();
 const MainTabScreen = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Search"
+      initialRouteName="Profile"
       activeColor="#fff"
       shifting={true}
       screenOptions={({route}) => ({

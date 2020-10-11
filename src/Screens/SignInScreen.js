@@ -9,6 +9,7 @@ import {
   Dimensions,
   StatusBar,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -27,6 +28,7 @@ const SignInScreen = ({navigation}) => {
     isValidUser: true,
     isValidpass: true,
   });
+  const [isSigned , setIsSigned] = useState(false);
   /*
   const [email_1, setEmail1] = useState('');
   const [password_1, setPassword1] = useState('');
@@ -167,13 +169,18 @@ const SignInScreen = ({navigation}) => {
         <View style={[styles.button, {alignItems: 'stretch'}]}>
           <TouchableOpacity
             onPress={() => {
+              setIsSigned(true);
               loginHandle(data.email, data.password);
             }}>
-            <LinearGradient
-              colors={['#A9EF0A', '#DAEF0A']}
-              style={styles.signIn}>
-              <Text style={[styles.textSign, {color: '#fff'}]}>Sign In</Text>
-            </LinearGradient>
+              {
+                isSigned?<ActivityIndicator size='large' color='#A9EF0A'/>
+                        :<LinearGradient
+                        colors={['#A9EF0A', '#DAEF0A']}
+                        style={styles.signIn}>
+                        <Text style={[styles.textSign, {color: '#fff'}]}>Sign In</Text>
+                        </LinearGradient>
+              }
+            
           </TouchableOpacity>
         </View>
 

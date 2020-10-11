@@ -82,11 +82,11 @@ const App = () => {
   useEffect(() => {
     console.disableYellowBox = true;
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  if (initializing) return null;
-
+if(initializing) return null;
   if (isLoading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>

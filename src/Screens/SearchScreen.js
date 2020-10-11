@@ -9,7 +9,7 @@ import {
   ScrollView,
   Dimensions,
   FlatList,
-  ActivityIndicator,
+  ActivityIndicator, 
   Keyboard,
   Alert,
 } from 'react-native';
@@ -34,10 +34,11 @@ const SearchScreen = () => {
     return (
       <TouchableOpacity
         onPress={() => {
-          console.log(props);
+          //console.log(props);
           navigation.navigate('VideoPlayer', {
             videoId: props.videoId,
             title: props.title,
+            snippet: props.snippet,
           });
         }}>
         <View style={{flexDirection: 'row', margin: 10}}>
@@ -63,6 +64,7 @@ const SearchScreen = () => {
       </TouchableOpacity>
     );
   };
+
   const Searching = () => {
     const [miniCardData, setminiCardData] = useState([]);
     const [isLoading, setisLoading] = useState(false);
@@ -75,7 +77,6 @@ const SearchScreen = () => {
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setminiCardData(data.items);
           setisLoading(false);
         });
@@ -96,7 +97,7 @@ const SearchScreen = () => {
             color="#212121"
             onPress={() => {
               setValue('');
-              updateInfo();
+             // updateInfo();
             }}
           />
           <TextInput
@@ -124,12 +125,14 @@ const SearchScreen = () => {
             <FlatList
               data={miniCardData}
               renderItem={({item}) => {
+                //console.log(miniCardData);
                 return (
                   <Minicard
                     videoId={item.id.videoId}
                     title={item.snippet.title}
                     channel={item.snippet.channelTitle}
                     img_url={item.snippet.thumbnails.high.url}
+                    snippet={item.snippet}
                   />
                 );
               }}

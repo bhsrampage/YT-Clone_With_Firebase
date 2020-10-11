@@ -5,8 +5,9 @@ import {
   Text,
   ActivityIndicator,
   FlatList,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
-
 const Card = (props) => {
   return (
     <TouchableOpacity

@@ -11,12 +11,13 @@ import {
   ScrollView,
   Alert,
   KeyboardAvoidingView,
+  Image
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
-import {TextInput} from 'react-native-paper';
+import {ActivityIndicator, TextInput} from 'react-native-paper';
 import {RadioButton} from 'react-native-paper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {AuthContext} from './Authentication/AuthProvider';
@@ -27,10 +28,13 @@ import firestore from '@react-native-firebase/firestore';
 
 const SignUpScreen = ({navigation}) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [imgsrc, setImgSrc] = useState(null);
+  const demoimg = "https://templates.joomla-monster.com/joomla30/jm-news-portal/components/com_djclassifieds/assets/images/default_profile.png";
+  const [imgsrc, setImgSrc] = useState("https://templates.joomla-monster.com/joomla30/jm-news-portal/components/com_djclassifieds/assets/images/default_profile.png");
   const {register, logout} = useContext(AuthContext);
-  const userRef = firestore().collection('Users');
-
+  const userRef = firestore().collection('Users'); 
+  const [isSignedUp , setIsSignedUp] = useState(false);
+  const [didChoose, setDidChoose] = useState(false);
+  const [isVisible , setIsVisible] = useState(false);
   const [data, setData] = useState({
     email: '',
     password: '',
@@ -59,16 +63,21 @@ const SignUpScreen = ({navigation}) => {
       Gender: data.gender,
       Password: data.password,
       ImgSource: imgsrc,
+      Fav: '{}',
     });
   };
 
   const imagepicker = () => {
+    setIsVisible(true);
     ImagePicker.openPicker({
       width: 300,
       height: 400,
       cropping: true,
+      includeBase64:true,
     }).then((image) => {
-      setImgSrc(image.path);
+      setImgSrc(`data:image/gif;base64,${image.data}`);
+      setDidChoose(true);
+      setIsVisible(false);
     });
   };
 
@@ -217,6 +226,11 @@ const SignUpScreen = ({navigation}) => {
             <Text style={styles.text_header}>Sign Up Now !</Text>
           </View>
           <Animatable.View style={styles.footer} animation="fadeInUpBig">
+            <View style={{width:100 , height:120 , marginLeft:Dimensions.get("screen").width/3.3  }}>
+            <Image style={{height:120 , width:120 , borderRadius:120/2 , borderColor:'#A9EF0A'  , borderWidth:2.5  }} 
+                  source = {{uri:`${imgsrc}`}}
+                  />
+            </View>
             <Text style={styles.text_footer}>Email</Text>
             <View style={styles.action}>
               <TextInput
@@ -250,12 +264,19 @@ const SignUpScreen = ({navigation}) => {
             </View>
             <Text style={styles.text_footer}>Profile Photo</Text>
             <View style={{margin: 15}}>
-              <Text
-                ellipsizeMode="tail"
-                numberOfLines={1}
-                style={{fontSize: 16, marginRight: 100}}>
-                {imgsrc}
-              </Text>
+              {
+                didChoose?(
+                <Text
+                  ellipsizeMode="tail"
+                  numberOfLines={1}
+                  style={{fontSize: 16, marginRight: 100}}>
+                  {imgsrc}
+                </Text>):isVisible?
+                <ActivityIndicator size='large' color='#A9EF0A' />:null
+                
+
+              }
+             
               <View style={{paddingRight: 15}}>
                 <Button
                   title="Choose Photo"
@@ -345,15 +366,20 @@ const SignUpScreen = ({navigation}) => {
             </View>
             <View style={styles.button}>
               <TouchableOpacity
-                onPress={() => createProfile()}
+                onPress={() => {createProfile(); setIsSignedUp(true);}}
                 style={styles.signIn}>
-                <LinearGradient
-                  colors={['#A9EF0A', '#DAEF0A']}
-                  style={styles.signIn}>
-                  <Text style={[styles.textSign, {color: '#fff'}]}>
-                    Register
-                  </Text>
-                </LinearGradient>
+                  {
+                    isSignedUp?<ActivityIndicator size='large' color='#A9EF0A'/>
+                    :<LinearGradient
+                    colors={['#A9EF0A', '#DAEF0A']}
+                    style={styles.signIn}>
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
+                      Register
+                    </Text>
+                  </LinearGradient>
+
+                  }
+                
               </TouchableOpacity>
             </View>
           </Animatable.View>
